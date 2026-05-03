@@ -1,350 +1,396 @@
+# ============================================================
+# AMCL（モンテカルロ自己位置推定）の設定
+# ============================================================
 amcl:
   ros__parameters:
-    use_sim_time: True
-    alpha1: 0.2
-    alpha2: 0.2
-    alpha3: 0.2
-    alpha4: 0.2
-    alpha5: 0.2
-    base_frame_id: "base_footprint"
-    beam_skip_distance: 0.5
-    beam_skip_error_threshold: 0.9
-    beam_skip_threshold: 0.3
-    do_beamskip: false
-    global_frame_id: "map"
-    lambda_short: 0.1
-    laser_likelihood_max_dist: 2.0
-    laser_max_range: 100.0
-    laser_min_range: -1.0
-    laser_model_type: "likelihood_field"
-    max_beams: 60
-    max_particles: 2000
-    min_particles: 500
-    odom_frame_id: "odom"
-    pf_err: 0.05
-    pf_z: 0.99
-    recovery_alpha_fast: 0.0
-    recovery_alpha_slow: 0.0
-    resample_interval: 1
-    robot_model_type: "nav2_amcl::DifferentialMotionModel"
-    save_pose_rate: 0.5
-    sigma_hit: 0.2
-    tf_broadcast: true
-    transform_tolerance: 1.0
-    update_min_a: 0.2
-    update_min_d: 0.25
-    z_hit: 0.5
-    z_max: 0.05
-    z_rand: 0.5
-    z_short: 0.05
-    scan_topic: scan
+    use_sim_time: True                        # シミュレーション時刻を使用するか
+    alpha1: 0.2                               # 回転による回転ノイズ係数
+    alpha2: 0.2                               # 並進による回転ノイズ係数
+    alpha3: 0.2                               # 並進による並進ノイズ係数
+    alpha4: 0.2                               # 回転による並進ノイズ係数
+    alpha5: 0.2                               # 並進による横ずれノイズ係数（全方向移動ロボット用）
+    base_frame_id: "base_footprint"           # ロボット本体のフレーム名
+    beam_skip_distance: 0.5                   # ビームスキップ判定距離 [m]
+    beam_skip_error_threshold: 0.9            # ビームスキップ適用のエラー率閾値
+    beam_skip_threshold: 0.3                  # ビームスキップ発動の割合閾値
+    do_beamskip: false                        # ビームスキップ処理を有効にするか
+    global_frame_id: "map"                    # グローバル座標フレーム名
+    lambda_short: 0.1                         # 短距離測定の指数分布係数
+    laser_likelihood_max_dist: 2.0            # 尤度フィールドの最大距離 [m]
+    laser_max_range: 100.0                    # LiDARの最大有効距離 [m]（-1で無制限）
+    laser_min_range: -1.0                     # LiDARの最小有効距離 [m]（-1で無効）
+    laser_model_type: "likelihood_field"      # レーザーモデルの種類（likelihood_field / beam）
+    max_beams: 60                             # 更新処理に使用するビーム数
+    max_particles: 2000                       # パーティクルの最大数
+    min_particles: 500                        # パーティクルの最小数
+    odom_frame_id: "odom"                     # オドメトリフレーム名
+    pf_err: 0.05                              # パーティクルフィルタの許容誤差
+    pf_z: 0.99                                # パーティクルフィルタの信頼区間
+    recovery_alpha_fast: 0.0                  # 高速リカバリのアルファ値（0.0で無効）
+    recovery_alpha_slow: 0.0                  # 低速リカバリのアルファ値（0.0で無効）
+    resample_interval: 1                      # リサンプリングを行う更新間隔
+    robot_model_type: "nav2_amcl::DifferentialMotionModel"  # ロボットの運動モデル
+    save_pose_rate: 0.5                       # 推定姿勢の保存頻度 [Hz]
+    sigma_hit: 0.2                            # ヒット測定のガウス標準偏差 [m]
+    tf_broadcast: true                        # map→odomのTFを配信するか
+    transform_tolerance: 1.0                  # TF変換の許容遅延時間 [s]
+    update_min_a: 0.2                         # フィルタ更新に必要な最小回転量 [rad]
+    update_min_d: 0.25                        # フィルタ更新に必要な最小移動量 [m]
+    z_hit: 0.5                                # ヒット測定モデルの重み
+    z_max: 0.05                               # 最大距離測定モデルの重み
+    z_rand: 0.5                               # ランダム測定モデルの重み
+    z_short: 0.05                             # 短距離測定モデルの重み
+    scan_topic: scan                          # 入力スキャンのトピック名
 
+# ============================================================
+# ビヘイビアツリーナビゲーター（BT Navigator）の設定
+# ============================================================
 bt_navigator:
   ros__parameters:
-    use_sim_time: True
-    global_frame: map
-    robot_base_frame: base_link
-    odom_topic: /odom
-    bt_loop_duration: 10
-    default_server_timeout: 20
-    wait_for_service_timeout: 1000
-    # 'default_nav_through_poses_bt_xml' and 'default_nav_to_pose_bt_xml' are use defaults:
+    use_sim_time: True                        # シミュレーション時刻を使用するか
+    global_frame: map                         # グローバル座標フレーム名
+    robot_base_frame: base_link               # ロボット本体のフレーム名
+    odom_topic: /odom                         # オドメトリのトピック名
+    bt_loop_duration: 10                      # BTの実行ループ周期 [ms]
+    default_server_timeout: 20               # アクションサーバーへのデフォルトタイムアウト [ms]
+    wait_for_service_timeout: 1000            # サービス待機タイムアウト [ms]
+    # デフォルトのBT XMLファイル（未指定時は以下を使用）:
     # nav2_bt_navigator/navigate_to_pose_w_replanning_and_recovery.xml
     # nav2_bt_navigator/navigate_through_poses_w_replanning_and_recovery.xml
-    # They can be set here or via a RewrittenYaml remap from a parent launch file to Nav2.
-    plugin_lib_names:
-      - nav2_compute_path_to_pose_action_bt_node
-      - nav2_compute_path_through_poses_action_bt_node
-      - nav2_smooth_path_action_bt_node
-      - nav2_follow_path_action_bt_node
-      - nav2_spin_action_bt_node
-      - nav2_wait_action_bt_node
-      - nav2_assisted_teleop_action_bt_node
-      - nav2_back_up_action_bt_node
-      - nav2_drive_on_heading_bt_node
-      - nav2_clear_costmap_service_bt_node
-      - nav2_is_stuck_condition_bt_node
-      - nav2_goal_reached_condition_bt_node
-      - nav2_goal_updated_condition_bt_node
-      - nav2_globally_updated_goal_condition_bt_node
-      - nav2_is_path_valid_condition_bt_node
-      - nav2_initial_pose_received_condition_bt_node
-      - nav2_reinitialize_global_localization_service_bt_node
-      - nav2_rate_controller_bt_node
-      - nav2_distance_controller_bt_node
-      - nav2_speed_controller_bt_node
-      - nav2_truncate_path_action_bt_node
-      - nav2_truncate_path_local_action_bt_node
-      - nav2_goal_updater_node_bt_node
-      - nav2_recovery_node_bt_node
-      - nav2_pipeline_sequence_bt_node
-      - nav2_round_robin_node_bt_node
-      - nav2_transform_available_condition_bt_node
-      - nav2_time_expired_condition_bt_node
-      - nav2_path_expiring_timer_condition
-      - nav2_distance_traveled_condition_bt_node
-      - nav2_single_trigger_bt_node
-      - nav2_goal_updated_controller_bt_node
-      - nav2_is_battery_low_condition_bt_node
-      - nav2_navigate_through_poses_action_bt_node
-      - nav2_navigate_to_pose_action_bt_node
-      - nav2_remove_passed_goals_action_bt_node
-      - nav2_planner_selector_bt_node
-      - nav2_controller_selector_bt_node
-      - nav2_goal_checker_selector_bt_node
-      - nav2_controller_cancel_bt_node
-      - nav2_path_longer_on_approach_bt_node
-      - nav2_wait_cancel_bt_node
-      - nav2_spin_cancel_bt_node
-      - nav2_back_up_cancel_bt_node
-      - nav2_assisted_teleop_cancel_bt_node
-      - nav2_drive_on_heading_cancel_bt_node
-      - nav2_is_battery_charging_condition_bt_node
+    # ここで指定するか、ランチファイルのRewrittenYamlでリマップ可能
+    plugin_lib_names:                         # BTノードとして読み込むプラグインの一覧
+      - nav2_compute_path_to_pose_action_bt_node          # 目標姿勢へのパス計算
+      - nav2_compute_path_through_poses_action_bt_node    # 複数姿勢を経由するパス計算
+      - nav2_smooth_path_action_bt_node                   # パスの平滑化
+      - nav2_follow_path_action_bt_node                   # パス追従
+      - nav2_spin_action_bt_node                          # その場回転
+      - nav2_wait_action_bt_node                          # 待機
+      - nav2_assisted_teleop_action_bt_node               # アシスト遠隔操作
+      - nav2_back_up_action_bt_node                       # 後退
+      - nav2_drive_on_heading_bt_node                     # 指定方向への直進
+      - nav2_clear_costmap_service_bt_node                # コストマップのクリア
+      - nav2_is_stuck_condition_bt_node                   # スタック検出条件
+      - nav2_goal_reached_condition_bt_node               # ゴール到達条件
+      - nav2_goal_updated_condition_bt_node               # ゴール更新条件
+      - nav2_globally_updated_goal_condition_bt_node      # グローバルゴール更新条件
+      - nav2_is_path_valid_condition_bt_node              # パス有効性条件
+      - nav2_initial_pose_received_condition_bt_node      # 初期姿勢受信条件
+      - nav2_reinitialize_global_localization_service_bt_node  # グローバル自己位置推定の再初期化
+      - nav2_rate_controller_bt_node                      # レートコントローラー
+      - nav2_distance_controller_bt_node                  # 距離コントローラー
+      - nav2_speed_controller_bt_node                     # 速度コントローラー
+      - nav2_truncate_path_action_bt_node                 # パスの切り詰め（グローバル）
+      - nav2_truncate_path_local_action_bt_node           # パスの切り詰め（ローカル）
+      - nav2_goal_updater_node_bt_node                    # ゴール更新ノード
+      - nav2_recovery_node_bt_node                        # リカバリーノード
+      - nav2_pipeline_sequence_bt_node                    # パイプラインシーケンス
+      - nav2_round_robin_node_bt_node                     # ラウンドロビンノード
+      - nav2_transform_available_condition_bt_node        # TF利用可能条件
+      - nav2_time_expired_condition_bt_node               # タイムアウト条件
+      - nav2_path_expiring_timer_condition                # パス期限タイマー条件
+      - nav2_distance_traveled_condition_bt_node          # 移動距離条件
+      - nav2_single_trigger_bt_node                       # シングルトリガーノード
+      - nav2_goal_updated_controller_bt_node              # ゴール更新コントローラー
+      - nav2_is_battery_low_condition_bt_node             # バッテリー残量低下条件
+      - nav2_navigate_through_poses_action_bt_node        # 複数ポーズ経由ナビゲーション
+      - nav2_navigate_to_pose_action_bt_node              # 単一ポーズへのナビゲーション
+      - nav2_remove_passed_goals_action_bt_node           # 通過済みゴールの除去
+      - nav2_planner_selector_bt_node                     # プランナーの選択
+      - nav2_controller_selector_bt_node                  # コントローラーの選択
+      - nav2_goal_checker_selector_bt_node                # ゴールチェッカーの選択
+      - nav2_controller_cancel_bt_node                    # コントローラーのキャンセル
+      - nav2_path_longer_on_approach_bt_node              # 接近時のパス延長条件
+      - nav2_wait_cancel_bt_node                          # 待機のキャンセル
+      - nav2_spin_cancel_bt_node                          # 回転のキャンセル
+      - nav2_back_up_cancel_bt_node                       # 後退のキャンセル
+      - nav2_assisted_teleop_cancel_bt_node               # アシスト遠隔操作のキャンセル
+      - nav2_drive_on_heading_cancel_bt_node              # 直進のキャンセル
+      - nav2_is_battery_charging_condition_bt_node        # 充電中条件
 
+# 複数ポーズ経由ナビゲーション用 rclcppノード設定
 bt_navigator_navigate_through_poses_rclcpp_node:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: True                        # シミュレーション時刻を使用するか
 
+# 単一ポーズへのナビゲーション用 rclcppノード設定
 bt_navigator_navigate_to_pose_rclcpp_node:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: True                        # シミュレーション時刻を使用するか
 
+# ============================================================
+# コントローラーサーバー（局所経路追従）の設定
+# ============================================================
 controller_server:
   ros__parameters:
-    use_sim_time: True
-    controller_frequency: 20.0
-    min_x_velocity_threshold: 0.001
-    min_y_velocity_threshold: 0.5
-    min_theta_velocity_threshold: 0.001
-    failure_tolerance: 0.3
-    progress_checker_plugin: "progress_checker"
-    goal_checker_plugins: ["general_goal_checker"] # "precise_goal_checker"
-    controller_plugins: ["FollowPath"]
+    use_sim_time: True                        # シミュレーション時刻を使用するか
+    controller_frequency: 20.0               # コントローラーの実行周波数 [Hz]
+    min_x_velocity_threshold: 0.001          # 前後速度の最小閾値（これ以下は0とみなす）[m/s]
+    min_y_velocity_threshold: 0.5            # 横方向速度の最小閾値（これ以下は0とみなす）[m/s]
+    min_theta_velocity_threshold: 0.001      # 角速度の最小閾値（これ以下は0とみなす）[rad/s]
+    failure_tolerance: 0.3                   # コントローラー失敗の許容時間 [s]
+    progress_checker_plugin: "progress_checker"          # 進捗チェッカープラグイン名
+    goal_checker_plugins: ["general_goal_checker"]       # ゴールチェッカープラグイン名のリスト
+    controller_plugins: ["FollowPath"]                   # コントローラープラグイン名のリスト
 
-    # Progress checker parameters
+    # 進捗チェッカーの設定
     progress_checker:
-      plugin: "nav2_controller::SimpleProgressChecker"
-      required_movement_radius: 0.5
-      movement_time_allowance: 10.0
-    # Goal checker parameters
-    #precise_goal_checker:
-    #  plugin: "nav2_controller::SimpleGoalChecker"
-    #  xy_goal_tolerance: 0.25
-    #  yaw_goal_tolerance: 0.25
-    #  stateful: True
-    general_goal_checker:
-      stateful: True
-      plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.25
-      yaw_goal_tolerance: 0.25
-    # DWB parameters
-    FollowPath:
-      plugin: "dwb_core::DWBLocalPlanner"
-      debug_trajectory_details: True
-      min_vel_x: 0.0
-      min_vel_y: 0.0
-      max_vel_x: 0.26
-      max_vel_y: 0.0
-      max_vel_theta: 1.0
-      min_speed_xy: 0.0
-      max_speed_xy: 0.26
-      min_speed_theta: 0.0
-      # Add high threshold velocity for turtlebot 3 issue.
-      # https://github.com/ROBOTIS-GIT/turtlebot3_simulations/issues/75
-      acc_lim_x: 2.5
-      acc_lim_y: 0.0
-      acc_lim_theta: 3.2
-      decel_lim_x: -2.5
-      decel_lim_y: 0.0
-      decel_lim_theta: -3.2
-      vx_samples: 20
-      vy_samples: 5
-      vtheta_samples: 20
-      sim_time: 1.7
-      linear_granularity: 0.05
-      angular_granularity: 0.025
-      transform_tolerance: 0.2
-      xy_goal_tolerance: 0.25
-      trans_stopped_velocity: 0.25
-      short_circuit_trajectory_evaluation: True
-      stateful: True
-      critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
-      BaseObstacle.scale: 0.02
-      PathAlign.scale: 32.0
-      PathAlign.forward_point_distance: 0.1
-      GoalAlign.scale: 24.0
-      GoalAlign.forward_point_distance: 0.1
-      PathDist.scale: 32.0
-      GoalDist.scale: 24.0
-      RotateToGoal.scale: 32.0
-      RotateToGoal.slowing_factor: 5.0
-      RotateToGoal.lookahead_time: -1.0
+      plugin: "nav2_controller::SimpleProgressChecker"  # 使用するプラグイン
+      required_movement_radius: 0.5          # 進捗と判定するための最小移動半径 [m]
+      movement_time_allowance: 10.0          # 進捗なしを許容する最大時間 [s]
 
+    # ゴールチェッカーの設定
+    #precise_goal_checker:                   # 精密ゴールチェッカー（コメントアウト中）
+    #  plugin: "nav2_controller::SimpleGoalChecker"
+    #  xy_goal_tolerance: 0.25              # XY方向の許容誤差 [m]
+    #  yaw_goal_tolerance: 0.25             # ヨー方向の許容誤差 [rad]
+    #  stateful: True                       # 一度到達したら状態を保持するか
+    general_goal_checker:
+      stateful: True                         # 一度到達したら状態を保持するか
+      plugin: "nav2_controller::SimpleGoalChecker"       # 使用するプラグイン
+      xy_goal_tolerance: 0.25               # XY方向の到達許容誤差 [m]
+      yaw_goal_tolerance: 0.25              # ヨー方向の到達許容誤差 [rad]
+
+    # DWBローカルプランナーの設定
+    FollowPath:
+      plugin: "dwb_core::DWBLocalPlanner"               # 使用するプラグイン
+      debug_trajectory_details: True         # トラジェクトリの詳細デバッグ情報を出力するか
+      min_vel_x: 0.0                         # X方向の最小速度 [m/s]
+      min_vel_y: 0.0                         # Y方向の最小速度 [m/s]
+      max_vel_x: 0.26                        # X方向の最大速度 [m/s]
+      max_vel_y: 0.0                         # Y方向の最大速度 [m/s]（差動駆動は0）
+      max_vel_theta: 1.0                     # 最大角速度 [rad/s]
+      min_speed_xy: 0.0                      # XY平面の最小合成速度 [m/s]
+      max_speed_xy: 0.26                     # XY平面の最大合成速度 [m/s]
+      min_speed_theta: 0.0                   # 最小回転速度 [rad/s]
+      # TurtleBot3の問題に対応するための高閾値速度設定
+      # https://github.com/ROBOTIS-GIT/turtlebot3_simulations/issues/75
+      acc_lim_x: 2.5                         # X方向の加速度上限 [m/s²]
+      acc_lim_y: 0.0                         # Y方向の加速度上限 [m/s²]（差動駆動は0）
+      acc_lim_theta: 3.2                     # 角加速度上限 [rad/s²]
+      decel_lim_x: -2.5                      # X方向の減速度上限（負値）[m/s²]
+      decel_lim_y: 0.0                       # Y方向の減速度上限 [m/s²]（差動駆動は0）
+      decel_lim_theta: -3.2                  # 角減速度上限（負値）[rad/s²]
+      vx_samples: 20                         # X方向速度のサンプリング数
+      vy_samples: 5                          # Y方向速度のサンプリング数
+      vtheta_samples: 20                     # 角速度のサンプリング数
+      sim_time: 1.7                          # トラジェクトリシミュレーション時間 [s]
+      linear_granularity: 0.05              # 直線方向の衝突チェック粒度 [m]
+      angular_granularity: 0.025            # 回転方向の衝突チェック粒度 [rad]
+      transform_tolerance: 0.2              # TF変換の許容遅延時間 [s]
+      xy_goal_tolerance: 0.25              # ゴールのXY許容誤差 [m]
+      trans_stopped_velocity: 0.25         # 停止とみなす並進速度の閾値 [m/s]
+      short_circuit_trajectory_evaluation: True  # 最悪スコアで早期終了するか
+      stateful: True                        # 前回の速度コマンドを状態として保持するか
+      critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
+                                            # 使用する評価クリティックの一覧
+      BaseObstacle.scale: 0.02             # 障害物回避クリティックの重み
+      PathAlign.scale: 32.0               # パス整合クリティックの重み
+      PathAlign.forward_point_distance: 0.1  # パス整合の前方参照点距離 [m]
+      GoalAlign.scale: 24.0               # ゴール整合クリティックの重み
+      GoalAlign.forward_point_distance: 0.1  # ゴール整合の前方参照点距離 [m]
+      PathDist.scale: 32.0                # パス距離クリティックの重み
+      GoalDist.scale: 24.0               # ゴール距離クリティックの重み
+      RotateToGoal.scale: 32.0           # ゴール方向回転クリティックの重み
+      RotateToGoal.slowing_factor: 5.0   # ゴール接近時の減速係数
+      RotateToGoal.lookahead_time: -1.0  # 先読み時間（-1は無効）[s]
+
+# ============================================================
+# ローカルコストマップの設定
+# ============================================================
 local_costmap:
   local_costmap:
     ros__parameters:
-      update_frequency: 5.0
-      publish_frequency: 2.0
-      global_frame: odom
-      robot_base_frame: base_link
-      use_sim_time: True
-      rolling_window: true
-      width: 3
-      height: 3
-      resolution: 0.05
-      robot_radius: 0.22
-      plugins: ["voxel_layer", "inflation_layer"]
+      update_frequency: 5.0               # コストマップの更新周波数 [Hz]
+      publish_frequency: 2.0              # コストマップの配信周波数 [Hz]
+      global_frame: odom                  # コストマップの基準フレーム
+      robot_base_frame: base_link         # ロボット本体のフレーム名
+      use_sim_time: True                  # シミュレーション時刻を使用するか
+      rolling_window: true                # ロボット中心のローリングウィンドウを使用するか
+      width: 3                            # コストマップの幅 [m]
+      height: 3                           # コストマップの高さ [m]
+      resolution: 0.05                    # コストマップの解像度 [m/cell]
+      robot_radius: 0.22                  # ロボットの半径 [m]（円形近似）
+      plugins: ["voxel_layer", "inflation_layer"]  # 使用するレイヤープラグインの一覧
       inflation_layer:
-        plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 3.0
-        inflation_radius: 0.55
+        plugin: "nav2_costmap_2d::InflationLayer"  # インフレーションレイヤープラグイン
+        cost_scaling_factor: 3.0          # コスト減衰の指数係数（大きいほど急峻）
+        inflation_radius: 0.55            # 障害物からのインフレーション半径 [m]
       voxel_layer:
-        plugin: "nav2_costmap_2d::VoxelLayer"
-        enabled: True
-        publish_voxel_map: True
-        origin_z: 0.0
-        z_resolution: 0.05
-        z_voxels: 16
-        max_obstacle_height: 2.0
-        mark_threshold: 0
-        observation_sources: scan
+        plugin: "nav2_costmap_2d::VoxelLayer"      # ボクセルレイヤープラグイン
+        enabled: True                     # レイヤーを有効にするか
+        publish_voxel_map: True           # ボクセルマップをトピック配信するか
+        origin_z: 0.0                     # ボクセルグリッドのZ原点 [m]
+        z_resolution: 0.05               # Z方向のボクセル解像度 [m]
+        z_voxels: 16                      # Z方向のボクセル数
+        max_obstacle_height: 2.0          # 障害物として検出する最大高さ [m]
+        mark_threshold: 0                 # セルをマークするのに必要な最小ボクセル数
+        observation_sources: scan         # センサーソース名（複数指定可）
         scan:
-          topic: /scan
-          max_obstacle_height: 2.0
-          clearing: True
-          marking: True
-          data_type: "LaserScan"
-          raytrace_max_range: 3.0
-          raytrace_min_range: 0.0
-          obstacle_max_range: 2.5
-          obstacle_min_range: 0.0
+          topic: /scan                    # スキャンデータのトピック名
+          max_obstacle_height: 2.0        # 障害物として扱う最大高さ [m]
+          clearing: True                  # 空きスペースのクリアを有効にするか
+          marking: True                   # 障害物のマーキングを有効にするか
+          data_type: "LaserScan"          # センサーデータの型
+          raytrace_max_range: 3.0         # レイトレースによるクリアの最大距離 [m]
+          raytrace_min_range: 0.0         # レイトレースによるクリアの最小距離 [m]
+          obstacle_max_range: 2.5         # 障害物をマークする最大距離 [m]
+          obstacle_min_range: 0.0         # 障害物をマークする最小距離 [m]
       static_layer:
-        plugin: "nav2_costmap_2d::StaticLayer"
-        map_subscribe_transient_local: True
-      always_send_full_costmap: True
+        plugin: "nav2_costmap_2d::StaticLayer"     # 静的マップレイヤープラグイン
+        map_subscribe_transient_local: True         # Transient Localでマップを購読するか
+      always_send_full_costmap: True      # 常に全コストマップを配信するか（差分ではなく）
 
+# ============================================================
+# グローバルコストマップの設定
+# ============================================================
 global_costmap:
   global_costmap:
     ros__parameters:
-      update_frequency: 1.0
-      publish_frequency: 1.0
-      global_frame: map
-      robot_base_frame: base_link
-      use_sim_time: True
-      robot_radius: 0.22
-      resolution: 0.05
-      track_unknown_space: true
-      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+      update_frequency: 1.0               # コストマップの更新周波数 [Hz]
+      publish_frequency: 1.0              # コストマップの配信周波数 [Hz]
+      global_frame: map                   # コストマップの基準フレーム
+      robot_base_frame: base_link         # ロボット本体のフレーム名
+      use_sim_time: True                  # シミュレーション時刻を使用するか
+      robot_radius: 0.22                  # ロボットの半径 [m]（円形近似）
+      resolution: 0.05                    # コストマップの解像度 [m/cell]
+      track_unknown_space: true           # 未知領域をコストマップで追跡するか
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]  # 使用するレイヤープラグイン
       obstacle_layer:
-        plugin: "nav2_costmap_2d::ObstacleLayer"
-        enabled: True
-        observation_sources: scan
+        plugin: "nav2_costmap_2d::ObstacleLayer"   # 障害物レイヤープラグイン
+        enabled: True                     # レイヤーを有効にするか
+        observation_sources: scan         # センサーソース名
         scan:
-          topic: /scan
-          max_obstacle_height: 2.0
-          clearing: True
-          marking: True
-          data_type: "LaserScan"
-          raytrace_max_range: 3.0
-          raytrace_min_range: 0.0
-          obstacle_max_range: 2.5
-          obstacle_min_range: 0.0
+          topic: /scan                    # スキャンデータのトピック名
+          max_obstacle_height: 2.0        # 障害物として扱う最大高さ [m]
+          clearing: True                  # 空きスペースのクリアを有効にするか
+          marking: True                   # 障害物のマーキングを有効にするか
+          data_type: "LaserScan"          # センサーデータの型
+          raytrace_max_range: 3.0         # レイトレースによるクリアの最大距離 [m]
+          raytrace_min_range: 0.0         # レイトレースによるクリアの最小距離 [m]
+          obstacle_max_range: 2.5         # 障害物をマークする最大距離 [m]
+          obstacle_min_range: 0.0         # 障害物をマークする最小距離 [m]
       static_layer:
-        plugin: "nav2_costmap_2d::StaticLayer"
-        map_subscribe_transient_local: True
+        plugin: "nav2_costmap_2d::StaticLayer"     # 静的マップレイヤープラグイン
+        map_subscribe_transient_local: True         # Transient Localでマップを購読するか
       inflation_layer:
-        plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 3.0
-        inflation_radius: 0.55
-      always_send_full_costmap: True
+        plugin: "nav2_costmap_2d::InflationLayer"  # インフレーションレイヤープラグイン
+        cost_scaling_factor: 3.0          # コスト減衰の指数係数（大きいほど急峻）
+        inflation_radius: 0.55            # 障害物からのインフレーション半径 [m]
+      always_send_full_costmap: True      # 常に全コストマップを配信するか（差分ではなく）
 
+# ============================================================
+# マップサーバーの設定
+# ============================================================
 map_server:
   ros__parameters:
-    use_sim_time: True
-    # Overridden in launch by the "map" launch configuration or provided default value.
-    # To use in yaml, remove the default "map" value in the tb3_simulation_launch.py file & provide full path to map below.
-    yaml_filename: ""
+    use_sim_time: True                    # シミュレーション時刻を使用するか
+    # ランチファイルの "map" 設定で上書きされる。
+    # YAMLから直接指定する場合は tb3_simulation_launch.py のデフォルト値を削除し、
+    # 以下にマップファイルのフルパスを記述すること。
+    yaml_filename: ""                     # 読み込むマップYAMLファイルのパス
 
+# ============================================================
+# マップセーバーの設定
+# ============================================================
 map_saver:
   ros__parameters:
-    use_sim_time: True
-    save_map_timeout: 5.0
-    free_thresh_default: 0.25
-    occupied_thresh_default: 0.65
-    map_subscribe_transient_local: True
+    use_sim_time: True                    # シミュレーション時刻を使用するか
+    save_map_timeout: 5.0                 # マップ保存のタイムアウト [s]
+    free_thresh_default: 0.25             # 自由空間と判定する占有確率の上限閾値
+    occupied_thresh_default: 0.65         # 占有空間と判定する占有確率の下限閾値
+    map_subscribe_transient_local: True   # Transient Localでマップを購読するか
 
+# ============================================================
+# プランナーサーバー（グローバル経路計画）の設定
+# ============================================================
 planner_server:
   ros__parameters:
-    expected_planner_frequency: 20.0
-    use_sim_time: True
-    planner_plugins: ["GridBased"]
+    expected_planner_frequency: 20.0     # プランナーの期待実行周波数 [Hz]
+    use_sim_time: True                   # シミュレーション時刻を使用するか
+    planner_plugins: ["GridBased"]       # 使用するプランナープラグイン名のリスト
     GridBased:
-      plugin: "nav2_navfn_planner/NavfnPlanner"
-      tolerance: 0.5
-      use_astar: false
-      allow_unknown: true
+      plugin: "nav2_navfn_planner/NavfnPlanner"  # 使用するプランナープラグイン
+      tolerance: 0.5                     # ゴール到達許容距離 [m]
+      use_astar: false                   # A*アルゴリズムを使用するか（falseはDijkstra）
+      allow_unknown: true                # 未知領域を通過するパスを許可するか
 
+# ============================================================
+# スムーザーサーバー（経路平滑化）の設定
+# ============================================================
 smoother_server:
   ros__parameters:
-    use_sim_time: True
-    smoother_plugins: ["simple_smoother"]
+    use_sim_time: True                   # シミュレーション時刻を使用するか
+    smoother_plugins: ["simple_smoother"] # 使用するスムーザープラグイン名のリスト
     simple_smoother:
-      plugin: "nav2_smoother::SimpleSmoother"
-      tolerance: 1.0e-10
-      max_its: 1000
-      do_refinement: True
+      plugin: "nav2_smoother::SimpleSmoother"    # 使用するスムーザープラグイン
+      tolerance: 1.0e-10                 # 収束判定の許容誤差
+      max_its: 1000                      # 最大反復回数
+      do_refinement: True                # 洗練化処理を有効にするか
 
+# ============================================================
+# ビヘイビアサーバー（回復行動）の設定
+# ============================================================
 behavior_server:
   ros__parameters:
-    costmap_topic: local_costmap/costmap_raw
-    footprint_topic: local_costmap/published_footprint
-    cycle_frequency: 10.0
+    costmap_topic: local_costmap/costmap_raw           # 使用するコストマップのトピック名
+    footprint_topic: local_costmap/published_footprint # フットプリントのトピック名
+    cycle_frequency: 10.0               # ビヘイビア実行の周波数 [Hz]
     behavior_plugins: ["spin", "backup", "drive_on_heading", "assisted_teleop", "wait"]
+                                        # 使用する回復行動プラグインの一覧
     spin:
-      plugin: "nav2_behaviors/Spin"
+      plugin: "nav2_behaviors/Spin"     # その場回転プラグイン
     backup:
-      plugin: "nav2_behaviors/BackUp"
+      plugin: "nav2_behaviors/BackUp"   # 後退プラグイン
     drive_on_heading:
-      plugin: "nav2_behaviors/DriveOnHeading"
+      plugin: "nav2_behaviors/DriveOnHeading"  # 指定方向直進プラグイン
     wait:
-      plugin: "nav2_behaviors/Wait"
+      plugin: "nav2_behaviors/Wait"     # 待機プラグイン
     assisted_teleop:
-      plugin: "nav2_behaviors/AssistedTeleop"
-    global_frame: odom
-    robot_base_frame: base_link
-    transform_tolerance: 0.1
-    use_sim_time: true
-    simulate_ahead_time: 2.0
-    max_rotational_vel: 1.0
-    min_rotational_vel: 0.4
-    rotational_acc_lim: 3.2
+      plugin: "nav2_behaviors/AssistedTeleop"  # アシスト遠隔操作プラグイン
+    global_frame: odom                  # グローバル座標フレーム名
+    robot_base_frame: base_link         # ロボット本体のフレーム名
+    transform_tolerance: 0.1            # TF変換の許容遅延時間 [s]
+    use_sim_time: true                  # シミュレーション時刻を使用するか
+    simulate_ahead_time: 2.0            # 前方シミュレーション時間 [s]
+    max_rotational_vel: 1.0             # 回転の最大角速度 [rad/s]
+    min_rotational_vel: 0.4             # 回転の最小角速度 [rad/s]
+    rotational_acc_lim: 3.2             # 回転の角加速度上限 [rad/s²]
 
+# ============================================================
+# ロボット状態パブリッシャーの設定
+# ============================================================
 robot_state_publisher:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: True                  # シミュレーション時刻を使用するか
 
+# ============================================================
+# ウェイポイントフォロワーの設定
+# ============================================================
 waypoint_follower:
   ros__parameters:
-    use_sim_time: True
-    loop_rate: 20
-    stop_on_failure: false
-    waypoint_task_executor_plugin: "wait_at_waypoint"
+    use_sim_time: True                  # シミュレーション時刻を使用するか
+    loop_rate: 20                       # メインループの周波数 [Hz]
+    stop_on_failure: false              # ウェイポイント失敗時に停止するか
+    waypoint_task_executor_plugin: "wait_at_waypoint"  # ウェイポイントタスク実行プラグイン名
     wait_at_waypoint:
-      plugin: "nav2_waypoint_follower::WaitAtWaypoint"
-      enabled: True
-      waypoint_pause_duration: 200
+      plugin: "nav2_waypoint_follower::WaitAtWaypoint"  # 使用するプラグイン
+      enabled: True                     # プラグインを有効にするか
+      waypoint_pause_duration: 200      # 各ウェイポイントでの停止時間 [ms]
 
+# ============================================================
+# 速度スムーザーの設定
+# ============================================================
 velocity_smoother:
   ros__parameters:
-    use_sim_time: True
-    smoothing_frequency: 20.0
-    scale_velocities: False
-    feedback: "OPEN_LOOP"
-    max_velocity: [0.26, 0.0, 1.0]
-    min_velocity: [-0.26, 0.0, -1.0]
-    max_accel: [2.5, 0.0, 3.2]
-    max_decel: [-2.5, 0.0, -3.2]
-    odom_topic: "odom"
-    odom_duration: 0.1
-    deadband_velocity: [0.0, 0.0, 0.0]
-    velocity_timeout: 1.0
+    use_sim_time: True                  # シミュレーション時刻を使用するか
+    smoothing_frequency: 20.0           # 速度平滑化の実行周波数 [Hz]
+    scale_velocities: False             # 加速度制限超過時に速度スケーリングするか
+    feedback: "OPEN_LOOP"               # フィードバック方式（OPEN_LOOP / CLOSED_LOOP）
+    max_velocity: [0.26, 0.0, 1.0]     # 最大速度 [前後 m/s, 横 m/s, 角 rad/s]
+    min_velocity: [-0.26, 0.0, -1.0]   # 最小速度（負方向）[前後 m/s, 横 m/s, 角 rad/s]
+    max_accel: [2.5, 0.0, 3.2]         # 最大加速度 [前後 m/s², 横 m/s², 角 rad/s²]
+    max_decel: [-2.5, 0.0, -3.2]       # 最大減速度（負値）[前後 m/s², 横 m/s², 角 rad/s²]
+    odom_topic: "odom"                  # オドメトリのトピック名（CLOSED_LOOP時に使用）
+    odom_duration: 0.1                  # オドメトリ速度推定の平均化時間 [s]
+    deadband_velocity: [0.0, 0.0, 0.0] # ゼロとみなすデッドバンド速度 [前後, 横, 角]
+    velocity_timeout: 1.0               # 速度コマンドがない場合の停止タイムアウト [s]
